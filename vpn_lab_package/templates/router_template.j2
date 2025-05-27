@@ -1,0 +1,40 @@
+ip vrf CUSTOMER1
+ rd 100:1
+ route-target export 100:1
+ route-target import 100:1
+
+interface GigabitEthernet0/0
+ description Internet-facing interface
+ ip address {{ public_ip }} 255.255.255.0
+
+interface GigabitEthernet0/1
+ description LAN interface
+ vrf forwarding CUSTOMER1
+ ip address {{ lan_ip }} 255.255.255.0
+
+interface Tunnel0
+ ip vrf forwarding CUSTOMER1
+ ip address {{ tunnel_ip }} 255.255.255.252
+ tunnel source GigabitEthernet0/0
+ tunnel destination {{ peer_public_ip }}
+ tunnel mode ipsec ipv4
+ tunnel protection ipsec profile VPN-PROFILE
+
+crypto isakmp policy 10
+ encr aes
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 86400
+
+crypto isakmp key cisco123 address {{ peer_public_ip }}
+
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+
+crypto ipsec profile VPN-PROFILE
+ set transform-set VPN-SET
+
+router ospf 100 vrf CUSTOMER1
+ router-id {{ public_ip }}
+ network {{ tunnel_ip }}/30 area 0
+ network {{ lan_ip }}/24 area 0

@@ -1,0 +1,3 @@
+router_name,role,public_ip,tunnel_ip,lan_ip,peer_public_ip,peer_tunnel_ip,peer_lan_ip
+RouterA,hub,1.1.1.1,10.10.10.1,192.168.1.1,2.2.2.2,10.10.10.2,192.168.2.1
+RouterB,spoke,2.2.2.2,10.10.10.2,192.168.2.1,1.1.1.1,10.10.10.1,192.168.1.1
